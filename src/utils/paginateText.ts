@@ -18,24 +18,11 @@ export function paginateText(
   
   const pages: Page[] = [];
   let currentPage: string[] = [];
-  
-  const isWord = (t: string) => /\S/.test(t);
-  const lastTokenIsNewline = () => currentPage.length > 0 && currentPage[currentPage.length - 1] === '\n';
 
   for (let i = 0; i < tokens.length; i++) {
     const token = tokens[i];
 
-    // After a line break in the source, the next word must start on a new page
-    if (isWord(token) && lastTokenIsNewline()) {
-      pages.push({
-        words: currentPage,
-        content: currentPage.join('')
-      });
-      currentPage = [token];
-      continue;
-    }
-
-    // Test if adding this token would overflow (each word/space/newline has real size)
+    // Only start a new page when adding this token would actually overflow (word/space/newline all have real measured size)
     const testWords = [...currentPage, token];
     const height = measureHeight(testWords);
 
