@@ -131,6 +131,7 @@ export function TextViewer({ text }: TextViewerProps) {
           totalPages={pages.length}
           onPrevious={handlePrevious}
           onNext={handleNext}
+          onGoToPage={handleGoToPage}
         />
       </CardContent>
     </Card>
