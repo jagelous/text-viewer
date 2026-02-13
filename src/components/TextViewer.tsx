@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { PaginationNav } from './PaginationNav';
 import { paginateText, Page } from '../utils/paginateText';
+import { BookOpen } from 'lucide-react';
 
 interface TextViewerProps {
   text: string;
@@ -12,6 +12,7 @@ export function TextViewer({ text }: TextViewerProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [containerHeight, setContainerHeight] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
   
   const contentRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -30,9 +31,9 @@ export function TextViewer({ text }: TextViewerProps) {
     if (!containerRef.current || !measureRef.current) return;
     
     const containerRect = containerRef.current.getBoundingClientRect();
-    const headerHeight = 60; // Approximate header height
-    const navHeight = 50; // Approximate nav height
-    const padding = 32; // Top and bottom padding
+    const headerHeight = 80;
+    const navHeight = 80;
+    const padding = 40;
     
     const availableHeight = containerRect.height - headerHeight - navHeight - padding;
     const availableWidth = containerRect.width - padding;
@@ -40,7 +41,7 @@ export function TextViewer({ text }: TextViewerProps) {
     setContainerHeight(availableHeight);
     setContainerWidth(availableWidth);
     
-    // Ensure measure element has correct width before pagination (so line wrapping matches)
+    // Ensure measure element has correct width before pagination
     measureRef.current.style.width = `${availableWidth}px`;
     
     const newPages = paginateText(text, availableWidth, availableHeight, measureTextHeight);
@@ -71,56 +72,75 @@ export function TextViewer({ text }: TextViewerProps) {
   }, [text, recalculatePages]);
   
   const handlePrevious = () => {
+    setIsAnimating(true);
     setCurrentPage(prev => Math.max(1, prev - 1));
+    setTimeout(() => setIsAnimating(false), 300);
   };
   
   const handleNext = () => {
+    setIsAnimating(true);
     setCurrentPage(prev => Math.min(pages.length, prev + 1));
+    setTimeout(() => setIsAnimating(false), 300);
   };
 
   const handleGoToPage = (page: number) => {
+    setIsAnimating(true);
     setCurrentPage(Math.max(1, Math.min(pages.length, page)));
+    setTimeout(() => setIsAnimating(false), 300);
   };
   
   const currentPageData = pages[currentPage - 1] || { words: [], content: '' };
   
   return (
-    <Card className="h-full flex flex-col border-slate-200 shadow-sm" ref={containerRef}>
-      <CardHeader className="pb-3 border-b border-slate-100">
-        <CardTitle className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-          Viewer
-        </CardTitle>
-      </CardHeader>
+    <div className="h-full flex flex-col bg-white" ref={containerRef}>
+      <div className="px-6 sm:px-8 pt-7 sm:pt-8 pb-5 border-b border-slate-200">
+        <div className="flex items-center gap-4">
+          <div className="p-2.5 rounded-xl bg-emerald-500">
+            <BookOpen className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-800">
+              Content Viewer
+            </h2>
+            <p className="text-xs text-slate-500 mt-1 font-medium">
+              Page <span className="font-bold text-emerald-600">{currentPage}</span> of <span className="font-bold text-slate-600">{pages.length}</span>
+            </p>
+          </div>
+        </div>
+      </div>
       
-      <CardContent className="flex-1 p-0 flex flex-col overflow-hidden relative">
+      <div className="flex-1 flex flex-col overflow-hidden relative">
         {/* Hidden measurement element */}
         <div
           ref={measureRef}
           className="absolute invisible"
           style={{
             width: containerWidth,
-            fontSize: '14px',
-            lineHeight: '1.625',
-            padding: '16px',
+            fontSize: '15px',
+            lineHeight: '1.7',
+            padding: '20px',
             whiteSpace: 'pre-wrap',
             wordWrap: 'break-word',
-            fontFamily: 'system-ui, sans-serif'
+            fontFamily: 'system-ui, -apple-system, sans-serif'
           }}
         />
         
         {/* Page content */}
-        <div className="flex-1 overflow-hidden p-4">
+        <div className="flex-1 overflow-hidden px-6 sm:px-8 py-7 sm:py-8">
           <div
             ref={contentRef}
-            className="w-full h-full text-sm leading-relaxed text-slate-700 whitespace-pre-wrap break-words"
+            className={`w-full h-full text-[15px] leading-relaxed text-slate-800 whitespace-pre-wrap break-words font-serif ${isAnimating ? 'opacity-70' : 'opacity-100'} transition-opacity duration-300`}
             style={{
               maxHeight: containerHeight,
               overflow: 'hidden'
             }}
           >
             {currentPageData.content || (
-              <span className="text-slate-400 italic">Your paginated text will appear here...</span>
+              <div className="flex items-center justify-center h-full">
+                <span className="text-slate-400 italic text-center text-lg">
+                  Your paginated text will appear here...
+                </span>
+              </div>
             )}
           </div>
         </div>
@@ -133,7 +153,7 @@ export function TextViewer({ text }: TextViewerProps) {
           onNext={handleNext}
           onGoToPage={handleGoToPage}
         />
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

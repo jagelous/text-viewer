@@ -33,20 +33,20 @@ export function PaginationNav({ currentPage, totalPages, onPrevious, onNext, onG
   };
 
   return (
-    <div className="flex items-center justify-center gap-4 py-3 border-t border-slate-200 bg-white flex-wrap">
+    <div className="flex items-center justify-center gap-4 sm:gap-6 py-5 sm:py-6 px-6 sm:px-8 border-t border-slate-200 bg-white">
       <Button
         variant="outline"
         size="sm"
         onClick={onPrevious}
         disabled={currentPage <= 1}
-        className="border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed p-2.5"
+        aria-label="Previous page"
       >
-        <ArrowLeft className="w-4 h-4 mr-1" />
-        Previous
+        <ArrowLeft className="w-5 h-5" />
       </Button>
 
-      <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-slate-700">Page</span>
+      <div className="flex items-center gap-2 px-3">
+        <span className="text-sm font-medium text-slate-600">Page</span>
         <input
           type="number"
           min={1}
@@ -55,10 +55,10 @@ export function PaginationNav({ currentPage, totalPages, onPrevious, onNext, onG
           onChange={(e) => setInputValue(e.target.value)}
           onBlur={goToPage}
           onKeyDown={handleKeyDown}
-          className="w-12 h-8 text-center text-sm font-medium border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-1"
+          className="w-14 h-9 text-center text-sm font-semibold border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white"
           aria-label="Page number"
         />
-        <span className="text-sm font-medium text-slate-700">of {totalPages}</span>
+        <span className="text-sm font-medium text-slate-600">of {totalPages}</span>
       </div>
 
       <Button
@@ -66,10 +66,10 @@ export function PaginationNav({ currentPage, totalPages, onPrevious, onNext, onG
         size="sm"
         onClick={onNext}
         disabled={currentPage >= totalPages}
-        className="border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed p-2.5"
+        aria-label="Next page"
       >
-        Next
-        <ArrowRight className="w-4 h-4 ml-1" />
+        <ArrowRight className="w-5 h-5" />
       </Button>
     </div>
   );
